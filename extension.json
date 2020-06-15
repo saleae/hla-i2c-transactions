@@ -1,0 +1,13 @@
+{
+  "name": "I2C Transactions",
+  "apiVersion": "1.0.0",
+  "author": "Mark Garrison",
+  "version": "0.0.1",
+  "description": "Converts I2C bytes into 1 frame per transaction",
+  "extensions": {
+    "I2C Transactions": {
+      "type": "HighLevelAnalyzer",
+      "entryPoint": "HighLevelAnalyzer.Hla"
+    }
+  }
+}
