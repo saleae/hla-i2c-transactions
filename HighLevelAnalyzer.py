@@ -3,8 +3,12 @@
 
 from saleae.analyzers import HighLevelAnalyzer, AnalyzerFrame, StringSetting, NumberSetting, ChoicesSetting
 
+LOWERCASE_OPTION = "Lowercase (0xff)"
+UPPERCASE_OPTION = "Uppercase (0xFF)"
+
 # High level analyzers must subclass the HighLevelAnalyzer class.
 class Hla(HighLevelAnalyzer):
+    formatting = ChoicesSetting(label="Formatting", choices=[LOWERCASE_OPTION, UPPERCASE_OPTION])
 
     # An optional list of types this analyzer produces, providing a way to customize the way frames are displayed in Logic 2.
     result_types = {
@@ -25,7 +29,10 @@ class Hla(HighLevelAnalyzer):
 
         Settings can be accessed using the same name used above.
         '''
-        pass
+        if self.formatting == LOWERCASE_OPTION:
+            self.byte_template = "0x{:x}"
+        else:
+            self.byte_template = "0x{:X}"
 
     def decode(self, frame: AnalyzerFrame):
         '''
@@ -51,14 +58,14 @@ class Hla(HighLevelAnalyzer):
 
         if frame.type == "address":
             address_byte = frame.data["address"][0]
-            self.temp_frame.data["address"] = hex(address_byte)
+            self.temp_frame.data["address"] = self.byte_template.format(address_byte)
 
         if frame.type == "data":
             data_byte = frame.data["data"][0]
             self.temp_frame.data["count"] += 1
             if len(self.temp_frame.data["data"]) > 0:
                 self.temp_frame.data["data"] += ", "
-            self.temp_frame.data["data"] += hex(data_byte)
+            self.temp_frame.data["data"] += self.byte_template.format(data_byte)
 
         if frame.type == "stop":
             self.temp_frame.end_time = frame.end_time
