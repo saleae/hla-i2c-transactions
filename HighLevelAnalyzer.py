@@ -1,5 +1,5 @@
 # High Level Analyzer
-# For more information and documentation, please go to https://support.saleae.com/extensions/high-level-analyzer-extensions
+# For more information and documentation, please go to https://support.saleae.com/extensions/high-level-analyzer-quickstart
 
 from saleae.analyzers import HighLevelAnalyzer, AnalyzerFrame, StringSetting, NumberSetting, ChoicesSetting
 
