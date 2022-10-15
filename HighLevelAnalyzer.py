@@ -55,10 +55,12 @@ class Hla(HighLevelAnalyzer):
             return frame_to_flush
 
         if frame.type == "address":
+            self.temp_frame.end_time = frame.end_time
             address_byte = frame.data["address"][0]
             self.temp_frame.data["address"] = hex(address_byte)
 
         if frame.type == "data":
+            self.temp_frame.end_time = frame.end_time
             data_byte = frame.data["data"][0]
             self.temp_frame.data["count"] += 1
             if len(self.temp_frame.data["data"]) > 0:
