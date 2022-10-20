@@ -36,24 +36,31 @@ class Hla(HighLevelAnalyzer):
         # set our frame to an error frame, which will eventually get over-written as we get data.
         if self.temp_frame is None:
             self.temp_frame = AnalyzerFrame("error", frame.start_time, frame.end_time, {
-                    "address": "error",
-                    "data": "",
-                    "count": 0
-                }
+                "address": "error",
+                "data": "",
+                "count": 0
+            }
             )
 
         if frame.type == "start" or (frame.type == "address" and self.temp_frame.type == "error"):
+            frame_to_flush = None
+            if frame.type == "start" and self.temp_frame.type != "error":
+                # the previous frame hasn't been flushed yet. Likely a repeated start event.
+                frame_to_flush = self.temp_frame
             self.temp_frame = AnalyzerFrame("hi2c", frame.start_time, frame.end_time, {
                     "data": "",
                     "count": 0
                 }
             )
+            return frame_to_flush
 
         if frame.type == "address":
+            self.temp_frame.end_time = frame.end_time
             address_byte = frame.data["address"][0]
             self.temp_frame.data["address"] = hex(address_byte)
 
         if frame.type == "data":
+            self.temp_frame.end_time = frame.end_time
             data_byte = frame.data["data"][0]
             self.temp_frame.data["count"] += 1
             if len(self.temp_frame.data["data"]) > 0:
