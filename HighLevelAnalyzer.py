@@ -12,7 +12,7 @@ class Hla(HighLevelAnalyzer):
                 'format': 'Error!'
             },
             "hi2c": {
-                'format': 'address: {{data.address}}; data[{{data.count}}]: [ {{data.data}} ]'
+                'format': 'address: {{data.address}} ({{data.direction}}); data[{{data.count}}]: [ {{data.data}} ]'
             }
         }
         
@@ -58,6 +58,10 @@ class Hla(HighLevelAnalyzer):
             self.temp_frame.end_time = frame.end_time
             address_byte = frame.data["address"][0]
             self.temp_frame.data["address"] = hex(address_byte)
+            if frame.data["read"] == True:
+                self.temp_frame.data["direction"] = "r"
+            else:
+                self.temp_frame.data["direction"] = "w"
 
         if frame.type == "data":
             self.temp_frame.end_time = frame.end_time
@@ -69,6 +73,9 @@ class Hla(HighLevelAnalyzer):
 
         if frame.type == "stop":
             self.temp_frame.end_time = frame.end_time
+            if "direction" in self.temp_frame.data and "address" in self.temp_frame.data:
+                print("I2C", self.temp_frame.data["direction"], self.temp_frame.data["address"], self.temp_frame.data["data"])
             new_frame = self.temp_frame
             self.temp_frame = None
             return new_frame
+        
